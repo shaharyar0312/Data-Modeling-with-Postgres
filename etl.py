@@ -7,6 +7,12 @@ from sql_queries import *
 
 #this function populate the dimension tables songs and artists from song file  
 def process_song_file(cur, filepath):
+    """
+        Arguments:
+        cur -> this argument is cursor pointing to the connector of database
+         filepath -> this argument contain the path of song_data
+    """
+    
     # open song file
     df = pd.read_json(filepath, lines=True)
 
@@ -20,6 +26,11 @@ def process_song_file(cur, filepath):
 
 # this function populate the dimension table time,user and fact table songsplays from log file 
 def process_log_file(cur, filepath):
+    """
+        Arguments:
+        cur -> this argument is cursor pointing to the connector of database
+         filepath -> this argument contain the path of log_data
+    """
     # open log file
     df = pd.read_json(filepath, lines=True)
 
@@ -32,7 +43,7 @@ def process_log_file(cur, filepath):
     # convert timestamp column to datetime (Transformation)
     t=pd.to_datetime(df['ts'], unit='ms')
     df['ts'] = pd.to_datetime(df['ts'], unit='ms')
-    
+
     # insert time data records (Transformation)
     time_data = list((t, t.dt.hour, t.dt.day, t.dt.weekofyear, t.dt.month, t.dt.year, t.dt.weekday))
     column_labels = list(('start_time', 'hour', 'day', 'week', 'month', 'year', 'weekday'))
@@ -59,7 +70,10 @@ def process_log_file(cur, filepath):
         if results:
             songid, artistid = results
         else:
-            songid, artistid = None, None
+            # I assign songId and artistId as NAN when result is empty 
+            # because constraints of songID and artistId are set to (not null)
+            # and None is interpreting in SQL as NULL which throwing an error
+            songid, artistid = np.nan, np.nan
 
         # insert songplay record
         songplay_data = (index, row.ts, row.userId, row.level, songid, artistid, row.sessionId,\
@@ -68,6 +82,13 @@ def process_log_file(cur, filepath):
 
 
 def process_data(cur, conn, filepath, func):
+    """
+        Arguments:
+        cur -> this argument is cursor pointing to the connector of database
+        conn -> Connector to database
+        filepath -> this argument contain the path of log_data
+        func contain the functions of process of song file and log file
+    """
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
