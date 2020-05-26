@@ -29,7 +29,10 @@ def create_database():
 
 def drop_tables(cur, conn):
     """
-    Drops each table using the queries in `drop_table_queries` list.
+    Description : Drops each table using the queries in `drop_table_queries` list.
+    Parameters: 
+        cur : cursor pointing to connector
+        conn : connector to database
     """
     for query in drop_table_queries:
         cur.execute(query)
