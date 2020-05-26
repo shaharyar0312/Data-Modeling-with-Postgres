@@ -8,9 +8,11 @@ from sql_queries import *
 #this function populate the dimension tables songs and artists from song file  
 def process_song_file(cur, filepath):
     """
-        Arguments:
+    Description:
+        This function process the songs file and load the data in dimension tables
+    Arguments:
         cur -> this argument is cursor pointing to the connector of database
-         filepath -> this argument contain the path of song_data
+        filepath -> this argument contain the path of song_data
     """
     
     # open song file
